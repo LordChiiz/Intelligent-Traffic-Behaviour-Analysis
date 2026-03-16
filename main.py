@@ -57,13 +57,13 @@ while cap.isOpened():
                 (30,90),cv2.FONT_HERSHEY_SIMPLEX,0.7,(0,255,255),2)
     
     cv2.putText(annotated_frame,f"Press 'q' to Quit",
-                (30,30),cv2.FONT_HERSHEY_SIMPLEX,0.6,(0,255,0),2)
+                (1400,30),cv2.FONT_HERSHEY_SIMPLEX,0.5,(0,255,0),2)
 
 
 
     cv2.imshow("Traffic Behavior Analysis",annotated_frame)
 
-    if cv2.waitKey(1) & 0xFF == ord('q'):
+    if cv2.waitKey(1) & 0xFF == ord('q') or cv2.waitKey(1) & 0xFF == ord('Q'):
         break
 
 
