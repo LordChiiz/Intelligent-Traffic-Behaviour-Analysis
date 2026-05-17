@@ -45,17 +45,21 @@ while cap.isOpened():
 
     annotated_frame = results[0].plot()
 
+    stopped = analyzer.stopped_vehicle_count()
 
     avg_speed = analyzer.average_speed()
 
     cv2.rectangle(annotated_frame,(20,20),(350,120),(0,0,0),-1)
 
-    cv2.putText(annotated_frame,f"Active Vehicles: {len(analyzer.speeds)}",
+    cv2.putText(annotated_frame,f"Active Vehicles: {analyzer.active_vehicle_count()}",
                 (30,50),cv2.FONT_HERSHEY_SIMPLEX,0.7,(0,255,0),2)
 
     cv2.putText(annotated_frame,f"Average Speed: {avg_speed:.2f}",
-                (30,90),cv2.FONT_HERSHEY_SIMPLEX,0.7,(0,255,255),2)
+                (30,130),cv2.FONT_HERSHEY_SIMPLEX,0.7,(0,255,255),2)
     
+    cv2.putText(annotated_frame,f"Stopped Vehicles: {stopped}",
+                (30,85),cv2.FONT_HERSHEY_SIMPLEX,0.7,(0,255,0),2)
+
     cv2.putText(annotated_frame,f"Press 'q' to Quit",
                 (1400,30),cv2.FONT_HERSHEY_SIMPLEX,0.5,(0,255,0),2)
 
