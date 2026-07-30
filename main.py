@@ -47,9 +47,11 @@ while cap.isOpened():
 
     stopped = analyzer.stopped_vehicle_count()
 
+    traffic_stats = analyzer.detect_congestion()
+
     avg_speed = analyzer.average_speed()
 
-    cv2.rectangle(annotated_frame,(20,20),(350,120),(0,0,0),-1)
+    cv2.rectangle(annotated_frame,(20,20),(450,170),(0,0,0),-1)
 
     cv2.putText(annotated_frame,f"Active Vehicles: {analyzer.active_vehicle_count()}",
                 (30,50),cv2.FONT_HERSHEY_SIMPLEX,0.7,(0,255,0),2)
@@ -59,6 +61,9 @@ while cap.isOpened():
     
     cv2.putText(annotated_frame,f"Stopped Vehicles: {stopped}",
                 (30,85),cv2.FONT_HERSHEY_SIMPLEX,0.7,(0,255,0),2)
+    
+    cv2.putText(annotated_frame,f"Traffic Status: {traffic_stats}",
+            (30,160),cv2.FONT_HERSHEY_SIMPLEX,0.7,(255,255,0),2)
 
     cv2.putText(annotated_frame,f"Press 'q' to Quit",
                 (1400,30),cv2.FONT_HERSHEY_SIMPLEX,0.5,(0,255,0),2)

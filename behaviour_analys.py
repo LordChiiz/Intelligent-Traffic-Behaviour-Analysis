@@ -102,3 +102,20 @@ class BehaviorAnalyzer:
     def stopped_vehicle_count(self):
 
         return len(self.stopped_vehicles)
+    
+    def detect_congestion(self):
+
+        active_vehicles = self.active_vehicle_count()
+        avg_speed = self.average_speed()
+    
+        VEHICLE_THRESHOLD = 5
+        SPEED_THRESHOLD = 5
+    
+        if active_vehicles >= VEHICLE_THRESHOLD and avg_speed <= SPEED_THRESHOLD:
+            return "Congested"
+    
+        elif active_vehicles >= VEHICLE_THRESHOLD and avg_speed <= SPEED_THRESHOLD * 2:
+            return "Slow Traffic"
+    
+        else:
+            return "Normal"
