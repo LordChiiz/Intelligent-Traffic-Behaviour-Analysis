@@ -32,6 +32,7 @@ while cap.isOpened():
     boxes = results[0].boxes
     annotated_frame = results[0].plot() #add the speed to label
 
+    visible_ids = set()
 
 
     if boxes is not None:
@@ -54,8 +55,12 @@ while cap.isOpened():
 
             speed = analyzer.estimate_speed(track_id, gp, frame_time)
 
+            visible_ids.add(track_id)
+
             label = f"{speed:.1f} km/h"
             cv2.putText(annotated_frame, label, (int(x1), int(y2) + 20), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 255), 2)
+
+        analyzer.cleanup_inactive_ids(visible_ids)
 
 
 

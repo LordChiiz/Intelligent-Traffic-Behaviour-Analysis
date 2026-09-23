@@ -119,7 +119,7 @@ class BehaviorAnalyzer:
         avg_speed = self.average_speed()
     
         VEHICLE_THRESHOLD = 5
-        SPEED_THRESHOLD = 10 #km/h
+        SPEED_THRESHOLD = 20 #km/h
     
         if active_vehicles >= VEHICLE_THRESHOLD and avg_speed <= SPEED_THRESHOLD:
             return "Congested"
@@ -129,3 +129,12 @@ class BehaviorAnalyzer:
     
         else:
             return "Normal"
+        
+    def cleanup_inactive_ids(self, visible_ids):
+        stale = [tid for tid in self.speeds if tid not in visible_ids ]
+        for tid in stale:
+            self.speeds.pop(tid, None)
+            self.prev_frame_times.pop(tid, None)
+            self.prev_world_positions.pop(tid, None)
+            self.stop_start_time.pop(tid, None)
+            self.stopped_vehicles.discard(tid)
