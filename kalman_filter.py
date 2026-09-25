@@ -1,11 +1,11 @@
 import numpy as np
 
 
-class kalman_filter:
+class KalmanFilter:
 
     def __init__(self, cx, cy, dt=1.0):
         
-        # Define state [position, velocity, acceleration]
+        # Define state [x, y, vx, vy]
         self.x = np.array([
             [cx],
             [cy],
@@ -86,6 +86,9 @@ class kalman_filter:
         self.P = (I - K @ self.H) @ self.P
 
         return self.x
+
+
+
 
 
 
