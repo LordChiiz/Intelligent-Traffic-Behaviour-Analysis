@@ -1,5 +1,6 @@
 from kalman_filter import KalmanFilter
 
+class Tracker:
 
     def __init__(self, track_id, bbox, dt=1.0):
 

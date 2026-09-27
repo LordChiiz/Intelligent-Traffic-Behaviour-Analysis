@@ -1,4 +1,4 @@
-def iou(box_a, box_b):
+def CalcIou(box_a, box_b):
 
     xa1, ya1, xa2, ya2 = box_a
     xb1, yb1, xb2, yb2 = box_b
