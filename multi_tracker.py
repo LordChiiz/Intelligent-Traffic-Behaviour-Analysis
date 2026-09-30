@@ -1,101 +1,53 @@
-from scipy.optimize import linear_sum_assignment
-from IoU import CalcIou
-import numpy as np
 from tracker import Tracker
+from Associate import associate
 
 class MultiObjectTracker:
-    def __init__(self):
+
+    def __init__(self, iou_threshold = 0.3, max_missed = 5, dt = 1.0):
 
         self.tracks = {}
         self.next_id = 0
+        self.iou_threshold = iou_threshold
+        self.max_missed = max_missed
+        self.dt = dt    
 
-    def predict(self):
+    def update(self, detections):
 
-        predictions = {}
-        for track_id, track in self.tracks.items():
-            predicted_bbox = track.predict()
-            predictions[track_id] = predicted_bbox
+        track_ids = list(self.tracks.keys())
+        predicted_boxes = [self.tracks[track_id].predict() for track_id in track_ids]
 
-        return predictions
-    
-    def calculate_iou_matrix(self, predictions, detections):
-        iou_matrix = []
-        for track_id, predicted_bbox in predictions.items():
-            iou_row = []
-            for detection_bbox in detections:
-                iou = CalcIou(predicted_bbox, detection_bbox)
-                iou_row.append(iou)
-            iou_matrix.append(iou_row)
-        return iou_matrix
-    
+        matches, unmatched_tracks, unmatched_detections = associate(predicted_boxes, detections, self.iou_threshold)
 
-    def assign_detections_to_tracks(self, iou_matrix, iou_threshold=0.3):
-        if len(iou_matrix) == 0 or len(iou_matrix[0]) == 0:
-            return []
-    
-        iou_matrix = np.array(iou_matrix)
-        cost_matrix = 1 - iou_matrix                                     
-        row_indices, col_indices = linear_sum_assignment(cost_matrix)
-
-
-
-        matches = []
-        unmatched_tracks = list(range(len(iou_matrix)))
-        unmatched_detections = list(range(len(iou_matrix[0])))
-
-        for row, col in zip(row_indices, col_indices):
-
-            row, col = int(row), int(col)
-
-            if iou_matrix[row, col] >= iou_threshold:
-                matches.append((row, col))
-                unmatched_tracks.remove(row)
-                unmatched_detections.remove(col)
-
-        return matches, unmatched_tracks, unmatched_detections
-    
-    def create_new_track(self, unmatched_detections, detections, dt = 1.0):
-
-        for detection_idx in unmatched_detections:
-
-            bbox = detections[detection_idx]
-            new_track = Tracker(
-                self.next_id, 
-                bbox, dt)
+        for track_pos, detect_idx in matches:
             
-            self.tracks[self.next_id] = new_track
+            track_id = track_ids[track_pos]
+            self.tracks[track_id].update(detections[detect_idx])
+
+        for u_track_pos in unmatched_tracks:
+            unmatched_id = track_ids[u_track_pos]
+            self._age_and_remove([unmatched_id])
+
+        new_box = [detections[i] for i in unmatched_detections]
+
+        self._create_new_tracks(new_box)
+
+        return {tid: track.bbox for tid, track in self.tracks.items()}
+
+
+
+
+
+
+    def _age_and_remove(self, unmatched_track_ids):
+        for track_id in unmatched_track_ids:
+            track = self.tracks[track_id]
+            track.missed_frames += 1
+            if track.missed_frames > self.max_missed:
+                del self.tracks[track_id]
+
+    
+    def _create_new_tracks(self, new_boxes):
+        for bbox in new_boxes:
+            self.tracks[self.next_id] = Tracker(self.next_id, bbox, dt=self.dt)
             self.next_id += 1
-
-    def missed_tracks(self, unmatched_tracks, max_missed = 5):
-
-        for unmatched_id in unmatched_tracks:
-            track_object = self.tracks[unmatched_id]
-            track_object.missed_frames += 1
-
-            if track_object.missed_frames >= max_missed:
-                self.tracks.pop(unmatched_id, None)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
