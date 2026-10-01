@@ -16,7 +16,7 @@ class MultiObjectTracker:
         track_ids = list(self.tracks.keys())
         predicted_boxes = [self.tracks[track_id].predict() for track_id in track_ids]
 
-        matches, unmatched_tracks, unmatched_detections = associate(predicted_boxes, detections, self.iou_threshold)
+        matches, unmatched_tracks, unmatched_detections, cost_matrix = associate(predicted_boxes, detections, self.iou_threshold)
 
         for track_pos, detect_idx in matches:
             
@@ -30,6 +30,17 @@ class MultiObjectTracker:
         new_box = [detections[i] for i in unmatched_detections]
 
         self._create_new_tracks(new_box)
+
+        # print("\n" + "="*40)
+        # print(f"Tracks: {track_ids}")
+        # print("\nCost matrix:")
+        # # Pretty prints the cost matrix row by row
+        # print("[" + ",\n ".join(f"[{', '.join(f'{val:.2f}' for val in row)}]" for row in cost_matrix) + "]")
+        
+        # print(f"\nMatches: {matches}")
+        # print(f"Unmatched tracks: {unmatched_tracks}")
+        # print(f"Unmatched detections: {unmatched_detections}")
+        # print("="*40 + "\n")
 
         return {tid: track.bbox for tid, track in self.tracks.items()}
 
