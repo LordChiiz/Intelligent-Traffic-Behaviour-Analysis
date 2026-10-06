@@ -3,7 +3,7 @@ from Associate import associate
 
 class MultiObjectTracker:
 
-    def __init__(self, iou_threshold = 0.3, max_missed = 5, dt = 1.0):
+    def __init__(self, iou_threshold = 0.2, max_missed = 5, dt = 1.0):
 
         self.tracks = {}
         self.next_id = 0

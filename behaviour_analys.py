@@ -1,18 +1,21 @@
 import math
 
 from calibration import pixel_to_world
+from kalman_filter import KalmanFilter
+
 
 class BehaviorAnalyzer:
 
-    def __init__(self):
 
         self.prev_world_positions = {}
         self.prev_frame_times = {}
+        self.kf_prev_times = {}
 
         self.speeds = {}   #km/h
 
         self.stopped_vehicles = set()
         self.stop_start_time = {}
+        self.speed_filters = {}
 
 
     def estimate_speed(self, track_id, ground_pixel_point, frame_time):
@@ -58,6 +61,42 @@ class BehaviorAnalyzer:
 
 
         return speed_kmh
+    
+    def kalman_filter_speed_estimation(self, track_id, ground_pixel_point, frame_time):
+
+        world_points = pixel_to_world(ground_pixel_point)
+        gx, gy = world_points
+        if track_id not in self.speed_filters:
+            speed_kf =  KalmanFilter(gx, gy, dt=self.dt, q_var=0.1, r_var=0.25, p_var=1.0)
+            self.speed_filters[track_id] = speed_kf
+            self.kf_prev_times[track_id] = frame_time
+            return 0
+
+       
+        dt = frame_time - self.kf_prev_times[track_id]
+        speed_kf = self.speed_filters[track_id]
+        speed_kf.set_dt(dt)
+        speed_kf.predict()
+        kf_state = speed_kf.update(gx, gy)
+
+        vx = kf_state[2, 0]  # velocity in x direction
+        vy = kf_state[3, 0]  # velocity in y direction
+
+        speed_mps = math.hypot(vx, vy)  # speed in meters per second
+        speed_kmh = speed_mps * 3.6
+
+        self.speeds[track_id] = speed_kmh
+        self.prev_world_positions[track_id] = (gx, gy)
+        self.kf_prev_times[track_id] = frame_time
+        self.detect_stopped_vehicle(track_id, speed_kmh, frame_time)
+
+        return speed_kmh
+
+
+
+        
+
+        
 
 
     def detect_stopped_vehicle(self, track_id, speed_kmh, frame_time):
@@ -138,3 +177,5 @@ class BehaviorAnalyzer:
             self.prev_world_positions.pop(tid, None)
             self.stop_start_time.pop(tid, None)
             self.stopped_vehicles.discard(tid)
+            self.kf_prev_times.pop(tid, None)
+            self.speed_filters.pop(tid, None)

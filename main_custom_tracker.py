@@ -7,7 +7,7 @@ from calibration import ground_point
 
 model = YOLO("yolov8n.pt")
 
-analyzer = BehaviorAnalyzer()
+
 mot = MultiObjectTracker()
 
 video_path = "traffic.mp4"
@@ -64,18 +64,30 @@ while cap.isOpened():
             visible_ids.add(track_id)
 
             tid_label = f"ID: {track_id}"
+            (text_w, text_h), baseline = cv2.getTextSize(tid_label, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 2)
+
+            cv2.rectangle(annotated_frame, (int(x1), int(y1) - text_h - baseline), (int(x1) + text_w, int(y1)), (233, 255, 233), -1)
+            cv2.putText(annotated_frame, tid_label, (int(x1), int(y1) - baseline), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 180, 0), 2)
 
     
 
             gp = ground_point(float(x1), float(y1), float(x2), float(y2))
 
-            speed = analyzer.estimate_speed(track_id, gp, frame_time)
+            # speed = analyzer.estimate_speed(track_id, gp, frame_time)
+            kalman_speed = analyzer.kalman_filter_speed_estimation(track_id, gp, frame_time)
 
-            speed_label = f"{speed:.1f} km/h"
+            # speed_label = f"{speed:.1f} km/h"
+            kalman_speed_label = f"{kalman_speed:.1f} km/h"
 
-            cv2.rectangle(annotated_frame, (int(x1), int(y1)), (int(x2), int(y2)), (0, 255, 0), 2)
-            cv2.putText(annotated_frame, speed_label, (int(x1), int(y1) - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
-            cv2.putText(annotated_frame, tid_label, (int(x1), int(y1) - 30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+            (text_w, text_h), baseline = cv2.getTextSize(kalman_speed_label, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 2)
+            cv2.rectangle(annotated_frame, (int(x1), int(y2)), (int(x1) + text_w, int(y2) + text_h + baseline), (233, 255, 233), -1)
+            cv2.putText(annotated_frame, kalman_speed_label, (int(x1), int(y2) + text_h), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 180, 0), 2)
+
+            # (text_w, text_h), baseline = cv2.getTextSize(kalman_speed_label, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 2)
+            # cv2.rectangle(annotated_frame, (int(x1), int(y2) + text_h + baseline + baseline), (int(x1) + text_w, int(y2) + text_h + baseline + text_h + baseline), (233, 255, 233), -1)
+            # cv2.putText(annotated_frame, speed_label, (int(x1), int(y2) + text_h + baseline + text_h + baseline), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 180, 0), 2)
+
+            cv2.rectangle(annotated_frame, (int(x1), int(y1)), (int(x2), int(y2)), (255, 255, 255), 2)
 
     analyzer.cleanup_inactive_ids(visible_ids)
 
