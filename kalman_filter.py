@@ -3,7 +3,7 @@ import numpy as np
 
 class KalmanFilter:
 
-    def __init__(self, cx, cy, dt=1.0):
+    def __init__(self, cx, cy, dt=1.0, q_var = 1.0, r_var = 5.0, p_var = 10.0):
         
         # Define state [x, y, vx, vy]
         self.x = np.array([
@@ -28,17 +28,17 @@ class KalmanFilter:
         ])
 
         #state uncertainty
-        self.P = np.eye(4) * 1.0
+        self.P = np.eye(4) * p_var
 
         
         #process noise
-        self.Q = np.eye(4) * 0.1
+        self.Q = np.eye(4) * q_var
 
 
         #measurement noise
         self.R = np.array([
-            [1.0, 0.0],
-            [0.0, 1.0]
+            [r_var, 0.0],
+            [0.0, r_var]
         ])
 
 

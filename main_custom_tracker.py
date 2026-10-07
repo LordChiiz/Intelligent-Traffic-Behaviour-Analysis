@@ -14,7 +14,7 @@ video_path = "traffic.mp4"
 cap = cv2.VideoCapture(video_path)
 fps = cap.get(cv2.CAP_PROP_FPS) or 30 # if it cant get it assume 30 fps
 
-
+analyzer = BehaviorAnalyzer(fps=fps)
 
 frame_index = 0
 

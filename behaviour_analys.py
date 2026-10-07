@@ -6,6 +6,7 @@ from kalman_filter import KalmanFilter
 
 class BehaviorAnalyzer:
 
+    def __init__(self, fps=30):
 
         self.prev_world_positions = {}
         self.prev_frame_times = {}
@@ -16,6 +17,7 @@ class BehaviorAnalyzer:
         self.stopped_vehicles = set()
         self.stop_start_time = {}
         self.speed_filters = {}
+        self.dt = 1.0/ fps
 
 
     def estimate_speed(self, track_id, ground_pixel_point, frame_time):
