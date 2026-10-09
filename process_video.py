@@ -6,9 +6,9 @@ from ultralytics import YOLO
 
 from multi_tracker import MultiObjectTracker
 from behaviour_analys import BehaviorAnalyzer
-from calibration import ground_point
+from calibration import ground_point, H as DEFAULT_H
 
-def process_video(input_path, raw_output_path, final_output_path, H):
+def process_video(input_path, raw_output_path, final_output_path, H=None):
 
     model = YOLO("yolov8n.pt")
 
@@ -22,6 +22,9 @@ def process_video(input_path, raw_output_path, final_output_path, H):
     height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
     mot = MultiObjectTracker(iou_threshold=0.2, max_missed=5, dt=1.0/fps)
+
+    if H is None:
+        H = DEFAULT_H
     analyzer = BehaviorAnalyzer(fps=fps, H=H)
 
     fourcc = cv2.VideoWriter_fourcc(*'mp4v')

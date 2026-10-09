@@ -6,7 +6,7 @@ from kalman_filter import KalmanFilter
 
 class BehaviorAnalyzer:
 
-    def __init__(self, fps=30):
+    def __init__(self, fps=30, H=None):
 
         self.prev_world_positions = {}
         self.prev_frame_times = {}
@@ -19,14 +19,14 @@ class BehaviorAnalyzer:
         self.speed_filters = {}
         self.dt = 1.0/ fps
 
-        self.homography_matrix = None  # Placeholder for the homography matrix
+        self.homography_matrix = H 
 
 
     def estimate_speed(self, track_id, ground_pixel_point, frame_time):
 
        
 
-        world_point = pixel_to_world(ground_pixel_point)
+        world_point = pixel_to_world(ground_pixel_point, H=self.homography_matrix)
 
         if track_id not in self.prev_world_positions:
 
