@@ -19,6 +19,8 @@ class BehaviorAnalyzer:
         self.speed_filters = {}
         self.dt = 1.0/ fps
 
+        self.homography_matrix = None  # Placeholder for the homography matrix
+
 
     def estimate_speed(self, track_id, ground_pixel_point, frame_time):
 

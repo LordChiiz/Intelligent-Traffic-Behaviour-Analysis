@@ -1,7 +1,7 @@
 import numpy as np
 import cv2
 
-IMAGE_POINTS = np.array([
+DEFAULT_IMAGE_POINTS = np.array([
     [481, 47],   # TL, Points were gotten from running the point picker on the video file
     [697, 47],   # TR
     [1270, 546],   # BR
@@ -9,20 +9,27 @@ IMAGE_POINTS = np.array([
 ], dtype=np.float32)
 
 
-WORLD_POINTS = np.array([
+DEFAULT_WORLD_POINTS = np.array([
     [0, 0],       # TL, meters, estimate of how wide and long the road is from our video data. adjustable
     [17.5, 0],     # TR, if an average lane is 3.5m, there are 4 main lanes, and one bus lane in traffic vidoe file ~ 5(3.5m)
     [17.5, 100],    # BR,  using length of the white dashes on the road(~3m) and the gaps between the dashes(~5m)
     [0, 100],      # BL
 ], dtype=np.float32)
 
-_H, _ = cv2.findHomography(IMAGE_POINTS, WORLD_POINTS)
+DEFAULT_H, _ = cv2.findHomography(DEFAULT_IMAGE_POINTS, DEFAULT_WORLD_POINTS)
 
 
-def pixel_to_world(point): #magic :)
+def create_homography_matrix(image_points, world_points):
+
+    H, _ = cv2.findHomography(image_points, world_points)
+    if H is None:
+        raise ValueError("Homography matrix could not be computed. Check the input points.")
+    return H
+
+def pixel_to_world(point, H=DEFAULT_H): #magic :)
     px, py = point
     p = np.array([[[px, py]]], dtype=np.float32)
-    world_p = cv2.perspectiveTransform(p, _H)
+    world_p = cv2.perspectiveTransform(p, H)
     return float(world_p[0][0][0]), float(world_p[0][0][1])
 
 
