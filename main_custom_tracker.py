@@ -99,10 +99,10 @@ while cap.isOpened():
 
     cv2.rectangle(annotated_frame,(20,20),(450,170),(0,0,0),-1)
 
-    cv2.putText(annotated_frame,f"Active Vehicles: {analyzer.active_vehicle_count()}",
+    cv2.putText(annotated_frame,f"Active Vehicles: {analyzer.moving_vehicle_count()}",
                 (30,50),cv2.FONT_HERSHEY_SIMPLEX,0.7,(0,255,0),2)
 
-    cv2.putText(annotated_frame,f"Average Speed: {avg_speed:.2f}",
+    cv2.putText(annotated_frame,f"Average Speed: {avg_speed:.2f}km/h",
                 (30,130),cv2.FONT_HERSHEY_SIMPLEX,0.7,(0,255,255),2)
     
     cv2.putText(annotated_frame,f"Stopped Vehicles: {stopped}",
@@ -118,7 +118,8 @@ while cap.isOpened():
 
     cv2.imshow("Traffic Behavior Analysis",annotated_frame)
 
-    if cv2.waitKey(1) & 0xFF == ord('q') or cv2.waitKey(1) & 0xFF == ord('Q'):
+    key = cv2.waitKey(1) & 0xFF
+    if key == ord('q') or key == ord('Q'):
         break
 
 
