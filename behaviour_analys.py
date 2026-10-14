@@ -124,23 +124,22 @@ class BehaviorAnalyzer:
                 del self.stop_start_time[track_id]  # Reset timer
 
             if track_id in self.stopped_vehicles:
-                self.stopped_vehicles.remove(track_id)
+                self.stopped_vehicles.remove(track_id)  # Vehicle is moving again
 
 
     def average_speed(self):
 
-        moving_speeds = [
+        all_veh_speeds = [
             speed for track_id, speed in self.speeds.items()
-            if track_id not in self.stopped_vehicles
-        ]
+            ]
 
-        if len(moving_speeds) == 0:
+        if len(all_veh_speeds) == 0:
             return 0
 
-        return sum(moving_speeds) / len(moving_speeds)
+        return sum(all_veh_speeds) / len(all_veh_speeds)
 
 
-    def active_vehicle_count(self):
+    def moving_vehicle_count(self):
 
         moving = [
             track_id for track_id in self.speeds
@@ -156,7 +155,7 @@ class BehaviorAnalyzer:
     
     def detect_congestion(self):
 
-        active_vehicles = self.active_vehicle_count()
+        active_vehicles = len(self.speeds)
         avg_speed = self.average_speed()
     
         VEHICLE_THRESHOLD = 5
