@@ -7,6 +7,7 @@ class Tracker:
         self.track_id = track_id
         self.bbox = bbox  # [x1, y1, x2, y2]
         self.missed_frames = 0
+        self.hits = 1
 
         x1, y1, x2, y2 = bbox
 
@@ -62,6 +63,7 @@ class Tracker:
         self.bbox = [new_x1, new_y1, new_x2, new_y2]
 
         self.missed_frames = 0
+        self.hits += 1
 
         return self.bbox
 

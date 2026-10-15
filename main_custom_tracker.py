@@ -111,8 +111,8 @@ while cap.isOpened():
             kalman_speed_label = f"{kalman_speed:.1f} km/h"
 
             (text_w, text_h), baseline = cv2.getTextSize(kalman_speed_label, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 2)
-            cv2.rectangle(annotated_frame, (int(x1), int(y2)), (int(x1) + text_w, int(y2) + text_h + baseline), (233, 255, 233), -1)
-            cv2.putText(annotated_frame, kalman_speed_label, (int(x1), int(y2) + text_h), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 180, 0), 2)
+            cv2.rectangle(annotated_frame, (int(x1), int(y2)), (int(x1) + text_w, int(y2) + text_h + baseline + baseline), (233, 255, 233), -1)
+            cv2.putText(annotated_frame, kalman_speed_label, (int(x1), int(y2) + text_h + baseline), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 180, 0), 2)
 
             # (text_w, text_h), baseline = cv2.getTextSize(kalman_speed_label, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 2)
             # cv2.rectangle(annotated_frame, (int(x1), int(y2) + text_h + baseline + baseline), (int(x1) + text_w, int(y2) + text_h + baseline + text_h + baseline), (233, 255, 233), -1)

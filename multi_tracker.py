@@ -3,12 +3,13 @@ from Associate import associate
 
 class MultiObjectTracker:
 
-    def __init__(self, iou_threshold = 0.2, max_missed = 5, dt = 1.0):
+    def __init__(self, iou_threshold = 0.2, max_missed = 5, dt = 1.0, min_hits = 10):
 
         self.tracks = {}
         self.next_id = 0
         self.iou_threshold = iou_threshold
         self.max_missed = max_missed
+        self.min_hits = min_hits
         self.dt = dt    
 
     def update(self, detections):
@@ -42,7 +43,7 @@ class MultiObjectTracker:
         # print(f"Unmatched detections: {unmatched_detections}")
         # print("="*40 + "\n")
 
-        return {tid: track.bbox for tid, track in self.tracks.items()}
+        return {tid: track.bbox for tid, track in self.tracks.items() if track.hits >= self.min_hits}
 
 
 
@@ -53,7 +54,7 @@ class MultiObjectTracker:
         for track_id in unmatched_track_ids:
             track = self.tracks[track_id]
             track.missed_frames += 1
-            if track.missed_frames > self.max_missed:
+            if track.missed_frames > self.max_missed  or track.hits < self.min_hits:
                 del self.tracks[track_id]
 
     
