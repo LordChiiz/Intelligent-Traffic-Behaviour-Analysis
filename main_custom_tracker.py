@@ -1,9 +1,10 @@
 from behaviour_analys import BehaviorAnalyzer
 from multi_tracker import MultiObjectTracker
+from calibration import ground_point
 
+import numpy as np
 import cv2
 from ultralytics import YOLO
-from calibration import ground_point
 
 model = YOLO("yolov8n.pt")
 
@@ -17,6 +18,36 @@ fps = cap.get(cv2.CAP_PROP_FPS) or 30 # if it cant get it assume 30 fps
 analyzer = BehaviorAnalyzer(fps=fps)
 
 frame_index = 0
+
+STATUS_COLORS = {            # BGR, like everything in OpenCV
+    "Normal": (0, 200, 0),
+    "Slow Traffic": (0, 165, 255),
+    "Congested": (0, 0, 255),
+}
+
+
+
+def draw_panel(frame, rows, x=15, y=45, w=270, alpha=0.55, radius=14):
+    row_h = 28
+    h = row_h * len(rows) + 16
+
+    mask = np.zeros((h, w), dtype=np.uint8)
+    cv2.rectangle(mask, (radius, 0), (w - 1 - radius, h - 1), 255, -1)
+    cv2.rectangle(mask, (0, radius), (w - 1, h - 1 - radius), 255, -1)
+    for cx in (radius, w - 1 - radius):
+        for cy in (radius, h - 1 - radius):
+            cv2.circle(mask, (cx, cy), radius, 255, -1, cv2.LINE_AA)
+
+    roi = frame[y:y + h, x:x + w]
+    a = (mask / 255.0 * alpha)[..., None]
+    frame[y:y + h, x:x + w] = (roi * (1 - a)).astype(np.uint8)
+
+
+    for i, (label, value, color) in enumerate(rows):
+        text_y = y + 28 + i * row_h
+        cv2.putText(frame, label, (x + 14, text_y), cv2.FONT_HERSHEY_SIMPLEX, 0.55, (190, 190, 190), 1, cv2.LINE_AA)
+        cv2.putText(frame, value, (x + 115, text_y), cv2.FONT_HERSHEY_SIMPLEX, 0.55, color, 1, cv2.LINE_AA)
+
 
 while cap.isOpened():
 
@@ -97,23 +128,12 @@ while cap.isOpened():
 
     avg_speed = analyzer.average_speed()
 
-    cv2.rectangle(annotated_frame,(20,20),(450,170),(0,0,0),-1)
-
-    cv2.putText(annotated_frame,f"Active Vehicles: {analyzer.moving_vehicle_count()}",
-                (30,50),cv2.FONT_HERSHEY_SIMPLEX,0.7,(0,255,0),2)
-
-    cv2.putText(annotated_frame,f"Average Speed: {avg_speed:.2f}km/h",
-                (30,130),cv2.FONT_HERSHEY_SIMPLEX,0.7,(0,255,255),2)
-    
-    cv2.putText(annotated_frame,f"Stopped Vehicles: {stopped}",
-                (30,85),cv2.FONT_HERSHEY_SIMPLEX,0.7,(0,255,0),2)
-    
-    cv2.putText(annotated_frame,f"Traffic Status: {traffic_stats}",
-            (30,160),cv2.FONT_HERSHEY_SIMPLEX,0.7,(255,255,0),2)
-
-    cv2.putText(annotated_frame,f"Press 'q' to Quit",
-                (1400,30),cv2.FONT_HERSHEY_SIMPLEX,0.5,(0,255,0),2)
-
+    draw_panel(annotated_frame, [
+        ("Moving", str(analyzer.moving_vehicle_count()), (255, 255, 255)),
+        ("Stopped", str(stopped), (255, 255, 255)),
+        ("Avg speed", f"{avg_speed:.1f} km/h", (255, 255, 255)),
+        ("Status", traffic_stats, STATUS_COLORS.get(traffic_stats, (255, 255, 255))),
+    ])
 
 
     cv2.imshow("Traffic Behavior Analysis",annotated_frame)
