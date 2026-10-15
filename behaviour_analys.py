@@ -158,13 +158,13 @@ class BehaviorAnalyzer:
         active_vehicles = len(self.speeds)
         avg_speed = self.average_speed()
     
-        VEHICLE_THRESHOLD = 5
+        VEHICLE_THRESHOLD = 7
         SPEED_THRESHOLD = 20 #km/h
     
         if active_vehicles >= VEHICLE_THRESHOLD and avg_speed <= SPEED_THRESHOLD:
             return "Congested"
     
-        elif active_vehicles >= VEHICLE_THRESHOLD and avg_speed <= SPEED_THRESHOLD * 2:
+        elif active_vehicles >= VEHICLE_THRESHOLD and avg_speed <= SPEED_THRESHOLD *2:
             return "Slow Traffic"
     
         else:
