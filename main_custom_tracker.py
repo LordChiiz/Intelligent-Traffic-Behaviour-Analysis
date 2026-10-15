@@ -15,6 +15,12 @@ video_path = "traffic.mp4"
 cap = cv2.VideoCapture(video_path)
 fps = cap.get(cv2.CAP_PROP_FPS) or 30 # if it cant get it assume 30 fps
 
+width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+writer = cv2.VideoWriter("demo_output.mp4", cv2.VideoWriter_fourcc(*"mp4v"), fps, (width, height))
+
+
+
 analyzer = BehaviorAnalyzer(fps=fps)
 
 frame_index = 0
@@ -135,7 +141,8 @@ while cap.isOpened():
         ("Status", traffic_stats, STATUS_COLORS.get(traffic_stats, (255, 255, 255))),
     ])
 
-
+    
+    writer.write(annotated_frame)
     cv2.imshow("Traffic Behavior Analysis",annotated_frame)
 
     key = cv2.waitKey(1) & 0xFF
@@ -143,5 +150,6 @@ while cap.isOpened():
         break
 
 
-cap.release()
+cap.release() 
+writer.release()
 cv2.destroyAllWindows()

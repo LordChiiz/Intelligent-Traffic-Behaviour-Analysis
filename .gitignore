@@ -1,5 +1,6 @@
-   __pycache__/
-   *.pyc
-   .venv/
-   venv/
-   .vscode/
+__pycache__/
+*.pyc
+.venv/
+venv/
+.vscode/
+demo_output.mp4
